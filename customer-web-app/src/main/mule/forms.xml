@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="submitForms" doc:id="ce3456af-06f1-4d8c-a57e-b8f34e9c8e7e" >
+		<http:listener doc:name="/submit/*" doc:id="95a17d43-e1e7-4e93-9b46-d8957d10d1e9" path="/submit/*" config-ref="HTTP_Listener_config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d1e369bf-950a-4578-a384-ad9af234c71d" message='#["Form submitted = " ++ (attributes.requestUri as String)]'/>
+		<set-variable value='#[(attributes.requestUri as String) default ""]' doc:name="Set requestPath" doc:id="c71ab423-f3a0-4bdb-b514-4c7a16bea759" variableName="requestPath"/>
+		<choice doc:name="Choice" doc:id="90905a60-2496-4caf-a7dc-35036624eb38" >
+			<when expression='#[("LOGIN" == "LOGIN") and (vars.requestPath endsWith "login")]'>
+				<logger level="INFO" doc:name="Logger" doc:id="ed7646ab-01a3-421d-89d3-ba99a79022b0" message="Logging -  login details"/>
+				<flow-ref doc:name="Flow Reference" doc:id="d4e859a2-4f59-4292-8d17-bc0b4b01ce99" name="login-form-logger"/>
+				<ee:transform doc:name="Transform Message" doc:id="1e1c56d8-6163-4285-b79b-acbf732e2bea">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	email: payload.parts.loginEmailID.content default null,
+	password: payload.parts.loginPassword.content default null
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<parse-template doc:name="Parse Template" doc:id="a17286e6-18ab-4a13-a461-459e85031255" location="web\loginComplete.html"/>
+			</when>
+			<when expression='#[("SIGNUP" == "SIGNUP") and (vars.requestPath endsWith "signup")]'>
+				<logger level="INFO" doc:name="Logger" doc:id="c226353a-6f60-4b43-ad7b-9ffa66c15a54" message="Logging -  signup details"/>
+				<flow-ref doc:name="Flow Reference" doc:id="70649089-6494-40f5-9f16-1717d3d20aee" name="signup-form-logger"/>
+				<ee:transform doc:name="Transform Message" doc:id="3b2ed956-a5db-42e0-bd27-4e0449d0645c">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var addressSameAsShipping = (payload.parts.sameAsShipping.content as String) default "off"
+---
+{
+	firstName: payload.parts.firstName.content default null,
+	lastName: payload.parts.lastName.content default null,
+	gender: payload.parts.gender.content default "none",
+	dateOfBirth: payload.parts.dateOfBirth.content default "00-00-0000",
+	email: payload.parts.email.content default "none",
+	emailSubscription: payload.parts.emailSubscription.content default false,
+	mobile: payload.parts.mobile.Content default "none",
+	smsSubscription: payload.parts.smsSubscription.content default false,
+	address: [
+		if(addressSameAsShipping == 'off')
+		{
+			addressType: "Billing",
+			addressLine: payload.parts.bill_to_address.content default "",
+			street: payload.parts.bill_to_street.content default null,
+			city: payload.parts.bill_to_city.content default "",
+			state: payload.parts.bill_to_state.content default "",
+			zipCode: payload.parts.bill_to_zip.content default "",
+			country: payload.parts.bill_to_country.content default ""
+		}
+		else {
+			addressType: "Billing",
+			addressLine: payload.parts.ship_to_address.content default "",
+			street: payload.parts.ship_to_street.content default null ,
+			city: payload.parts.ship_to_city.content default "",
+			state: payload.parts.ship_to_state.content default "",
+			zipCode: payload.parts.ship_to_zip.content default "",
+			country: payload.parts.ship_to_country.content default ""
+		},
+		{
+			addressType: "Shipping",
+			addressLine: payload.parts.ship_to_address.content default "",
+			street: payload.parts.ship_to_street.content default null ,
+			city: payload.parts.ship_to_city.content default "",
+			state: payload.parts.ship_to_state.content default "",
+			zipCode: payload.parts.ship_to_zip.content default "",
+			country: payload.parts.ship_to_country.content default ""
+		},
+	]
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<parse-template doc:name="Parse Template" doc:id="068afc7c-f3bf-43e9-9459-00108f828aef" location="web\signupComplete.html"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="dfd501b3-f6ba-41a7-8745-fa91e778ba97" message='#["Unknown form submitted - Route to home page"]'/>
+				<http:load-static-resource doc:name="Load static resource" doc:id="9f39258e-f885-477d-90fe-6d0dfdbf0d36" resourceBasePath='#[mule.home ++ "\\apps\\" ++ app.name ++ "\\web\\"]' defaultFile="home.html"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

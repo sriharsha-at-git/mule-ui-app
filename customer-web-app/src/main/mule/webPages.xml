@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config
+		name="HTTP_Listener_config"
+		doc:name="HTTP Listener config"
+		doc:id="caac154c-7b7f-4f40-a8b8-2997ec417fa3">
+		<http:listener-connection
+			host="0.0.0.0"
+			port="8081" />
+	</http:listener-config>
+	<flow name="homePage" doc:id="5f8a028e-b20f-4633-8c2c-390c81299c9e">
+		<http:listener doc:name="/" doc:id="b62742d8-cb14-4c4f-9019-fd103337788d" path="/" outputMimeType="multipart/form-data" config-ref="HTTP_Listener_config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="588facfd-11c4-40fd-8938-cc81dab46eef" message='#["Received request for = " ++ (attributes.requestUri as String)]'/>
+		<http:load-static-resource doc:name="Load static resource" doc:id="c6892d53-18e6-4e39-8bb3-72f23c95842d" resourceBasePath='#[mule.home ++ "\\apps\\" ++ app.name ++ "\\web"]' defaultFile="home.html"/>
+	</flow>
+	<flow name="loginPage" doc:id="76734259-0222-4d78-bcd6-3de3d382d73a" >
+		<http:listener doc:name="/login" doc:id="b8560251-8b93-4742-aa46-43d0ce6723d9" path="/login" config-ref="HTTP_Listener_config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e2356944-c3e8-430f-81b3-fbad50e79ba3" message='#["Received request for = " ++ (attributes.requestUri as String)]'/>
+		<http:load-static-resource doc:name="Load static resource" doc:id="75accaa1-61fa-43e2-8e53-e1529e363a22" resourceBasePath='#[mule.home ++ "\\apps\\" ++ app.name ++ "\\web\\"]' defaultFile="login.html"/>
+	</flow>
+	<flow name="signupPage" doc:id="44d13acb-ab5d-4fe9-9c78-4ced0c692587" >
+		<http:listener doc:name="/signup" doc:id="b05a7a26-da1f-4106-972f-b857c560bbff" path="/signup" config-ref="HTTP_Listener_config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="bd4f042e-8cab-4ebf-8671-80533328fc0c" message='#["Received request for = " ++ (attributes.requestUri as String)]'/>
+		<http:load-static-resource doc:name="Load static resource" doc:id="77d9a5a5-fe4f-40c6-8084-cd2681d7b400" resourceBasePath='#[mule.home ++ "\\apps\\" ++ app.name ++ "\\web\\"]' defaultFile="signup.html"/>
+	</flow>
+</mule>

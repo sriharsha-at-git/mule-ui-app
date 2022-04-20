@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="signup-form-logger" doc:id="f369dd70-f3c6-4e0f-8502-2a7f0c94ef35" >
+		<logger level="INFO" doc:name="Logger firstName" doc:id="0cbf8c05-3e19-42fd-b39c-f14f71553657" message='#["firstName value – " ++ payload.parts.firstName.content]' />
+		<logger level="INFO" doc:name="Logger lastName" doc:id="514c857e-15ef-44f3-97a4-293c290a1f05" message='#["lastName value – " ++ payload.parts.lastName.content]' />
+		<logger level="INFO" doc:name="Logger gender" doc:id="abfaf1e2-177d-49b4-9b2f-77ca244eb8f9" message='#["Gender value – " ++ payload.parts.gender.content]' />
+		<logger level="INFO" doc:name="Logger dob" doc:id="566a0f6b-734d-426c-8a0e-45e930b560cc" message='#["DateOfBirth value – " ++ payload.parts.dateOfBirth.content]' />
+		<logger level="INFO" doc:name="Logger email" doc:id="d3e09465-5abd-4ebb-9d45-83f2abd02b6b" message='#["Email value – " ++ payload.parts.email.content]' />
+		<logger level="INFO" doc:name="Logger emailSub" doc:id="146c9f08-6a4d-407f-a7a8-2ae83df7c33b" message='#["EmailSubscription value – " ++ (payload.parts.emailSubscription.content default "off")]' />
+		<logger level="INFO" doc:name="Logger mobile" doc:id="5dac317d-2d68-4ce1-9abb-9815d0126e35" message='#["Mobile value – " ++ payload.parts.mobile.content]' />
+		<logger level="INFO" doc:name="Logger smsSub" doc:id="e9c1bd80-61fc-4bbf-9f5f-4bdbe134bf2d" message='#["SMSSubscription value – " ++ (payload.parts.smsSubscription.content default "off")]' />
+	</sub-flow>
+	<sub-flow name="login-form-logger" doc:id="9c7fe00e-7033-418a-90e8-7c133739882d" >
+		<logger level="INFO" doc:name="Logger" doc:id="5d5469c0-5129-448b-8bfa-e0fef52207d1" message='#["login username value – " ++ payload.parts.loginEmailID.content]'/>
+		<logger level="INFO" doc:name="Logger" doc:id="d0056207-2f57-4778-8172-6ffe17498812" message='#["login password value – " ++ payload.parts.loginPassword.content]'/>
+	</sub-flow>
+</mule>
